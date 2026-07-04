@@ -102,8 +102,9 @@ p { margin: 0 0 16px; color: var(--ink-700); }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
   padding: 14px 24px;
-  max-width: var(--maxw);
+  max-width: 1320px;
   margin: 0 auto;
 }
 
@@ -115,6 +116,8 @@ p { margin: 0 0 16px; color: var(--ink-700); }
   font-weight: 700;
   font-size: 1.15rem;
   color: var(--green-900);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .brand:hover { text-decoration: none; }
 
@@ -146,13 +149,17 @@ p { margin: 0 0 16px; color: var(--ink-700); }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 22px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+.nav-links li { flex-shrink: 0; }
+
 .nav-links a {
+  display: inline-block;
+  white-space: nowrap;
   color: var(--ink-700);
   font-weight: 500;
   font-size: 0.95rem;
@@ -169,6 +176,7 @@ p { margin: 0 0 16px; color: var(--ink-700); }
   border-radius: 999px;
   border: none !important;
   font-weight: 600 !important;
+  white-space: nowrap;
 }
 .nav-cta:hover { background: var(--green-800); }
 

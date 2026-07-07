@@ -16,12 +16,14 @@
   <div class="brand"><span class="brand-mark">P</span> PHAOS</div>
   <div class="tabs">
     <button class="tab-btn active" data-tab="farmer" onclick="switchTab('farmer')">Farmer App</button>
-    <button class="tab-btn" data-tab="operator" onclick="switchTab('operator')">Operator Dashboard</button>
+    <button class="tab-btn" data-tab="staff" onclick="switchTab('staff')">Staff App</button>
+    <button class="tab-btn" data-tab="admin" onclick="switchTab('admin')">Admin Dashboard</button>
   </div>
 </header>
 
 <main>
 
+  <!-- ===================== FARMER APP (Modules 1 partial, 3) ===================== -->
   <section id="view-farmer" class="view active">
     <div class="section-title">
       <h2>Storage Available Near You</h2>
@@ -40,21 +42,127 @@
     </div>
   </section>
 
-  <section id="view-operator" class="view">
-    <div class="section-title">
-      <h2>Chamber Occupancy</h2>
-      <p>Live view — same data your farmers now see on their own phones</p>
+  <!-- ===================== STAFF APP (Modules 2, 4, 5) ===================== -->
+  <section id="view-staff" class="view">
+    <div class="subnav">
+      <button class="subnav-btn active" data-sub="onboarding" onclick="switchSub('staff','onboarding')">Grower Onboarding</button>
+      <button class="subnav-btn" data-sub="gatein" onclick="switchSub('staff','gatein')">Gate In</button>
+      <button class="subnav-btn" data-sub="weighing" onclick="switchSub('staff','weighing')">Weighing</button>
+      <button class="subnav-btn" data-sub="qc" onclick="switchSub('staff','qc')">Quality Control</button>
+      <button class="subnav-btn" data-sub="bin" onclick="switchSub('staff','bin')">Bin Allocation</button>
+      <button class="subnav-btn" data-sub="dispatch" onclick="switchSub('staff','dispatch')">Dispatch Queue</button>
     </div>
-    <div class="dash-grid" id="chamber-grid"></div>
 
-    <div class="section-title">
-      <h2>Recent Activity</h2>
-      <p>Across all gate, quality, and dispatch events</p>
+    <div id="staff-onboarding" class="subview active">
+      <div class="section-title"><h2>New Grower Onboarding</h2><p>Module 2 — Grower &amp; Agreement</p></div>
+      <div class="card" style="max-width:720px;margin-bottom:28px;">
+        <div class="form-grid">
+          <div class="form-field"><label>Full Name</label><input type="text" id="ob-name" value="Bashir Ahmad" /></div>
+          <div class="form-field"><label>Phone</label><input type="text" id="ob-phone" value="+91 9906745123" /></div>
+          <div class="form-field"><label>Village</label><input type="text" id="ob-village" value="Tral, Pulwama" /></div>
+          <div class="form-field"><label>CA Rate (₹/crate/month)</label><input type="text" id="ob-rate" value="18" /></div>
+          <div class="form-field"><label>Crate Rental (₹/crate)</label><input type="text" id="ob-rental" value="5" /></div>
+          <div class="form-field"><label>Commodity</label><select id="ob-commodity"><option>Apple</option><option>Plum</option><option>Cherry</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="onboardGrower()">Save Grower &amp; Generate Agreement</button>
+      </div>
+      <div class="section-title"><h2>Recently Onboarded</h2><p></p></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Village</th><th>Phone</th><th>Rate</th><th>Status</th></tr></thead><tbody id="grower-table"></tbody></table></div>
     </div>
-    <div class="activity-feed" id="activity-feed"></div>
 
-    <div class="callout">
-      This is the same operational visibility you have today — <strong>plus a farmer-facing layer your current system doesn't offer</strong>, at no extra work for your staff.
+    <div id="staff-gatein" class="subview">
+      <div class="section-title"><h2>Gate In — Vehicle Intake</h2><p>Module 4 — Intake &amp; Storage Operations</p></div>
+      <div class="card" style="max-width:720px;margin-bottom:28px;">
+        <div class="form-grid">
+          <div class="form-field"><label>Grower</label><select id="gi-grower"></select></div>
+          <div class="form-field"><label>Vehicle No.</label><input type="text" id="gi-vehicle" value="JK04G-6423" /></div>
+          <div class="form-field"><label>Package Type</label><select id="gi-package"><option>Crates</option><option>Bags</option></select></div>
+          <div class="form-field"><label>Quantity</label><input type="text" id="gi-qty" value="120" /></div>
+        </div>
+        <button class="btn btn-primary" onclick="gateIn()">Record Gate In</button>
+      </div>
+      <div class="section-title"><h2>Today's Gate Entries</h2><p></p></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Lot ID</th><th>Grower</th><th>Vehicle</th><th>Qty</th><th>Status</th></tr></thead><tbody id="gatein-table"></tbody></table></div>
+    </div>
+
+    <div id="staff-weighing" class="subview">
+      <div class="section-title"><h2>Weighing Queue</h2><p>Module 4 — auto-capture from weighbridge, or manual entry</p></div>
+      <div id="weighing-queue"></div>
+    </div>
+
+    <div id="staff-qc" class="subview">
+      <div class="section-title"><h2>Quality Control Queue</h2><p>Module 4 — grade + photo evidence</p></div>
+      <div id="qc-queue"></div>
+    </div>
+
+    <div id="staff-bin" class="subview">
+      <div class="section-title"><h2>Bin Allocation Queue</h2><p>Module 4 — assign chamber, floor, bin</p></div>
+      <div id="bin-queue"></div>
+    </div>
+
+    <div id="staff-dispatch" class="subview">
+      <div class="section-title"><h2>Dispatch Requests</h2><p>Module 5 — farmer-initiated, staff-confirmed</p></div>
+      <div id="dispatch-queue"></div>
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN DASHBOARD (Modules 6, 7, 8, 9) ===================== -->
+  <section id="view-admin" class="view">
+    <div class="subnav">
+      <button class="subnav-btn active" data-sub="overview" onclick="switchSub('admin','overview')">Overview</button>
+      <button class="subnav-btn" data-sub="invoices" onclick="switchSub('admin','invoices')">Invoices</button>
+      <button class="subnav-btn" data-sub="import" onclick="switchSub('admin','import')">Data Import</button>
+      <button class="subnav-btn" data-sub="notifications" onclick="switchSub('admin','notifications')">Notifications</button>
+      <button class="subnav-btn" data-sub="facilities" onclick="switchSub('admin','facilities')">Facilities</button>
+    </div>
+
+    <div id="admin-overview" class="subview active">
+      <div class="section-title">
+        <h2>Chamber Occupancy</h2>
+        <p>Live view — same data your farmers now see on their own phones</p>
+      </div>
+      <div class="dash-grid" id="chamber-grid"></div>
+
+      <div class="section-title">
+        <h2>Recent Activity</h2>
+        <p>Across all gate, quality, and dispatch events</p>
+      </div>
+      <div class="activity-feed" id="activity-feed"></div>
+
+      <div class="callout">
+        This is the same operational visibility you have today — <strong>plus a farmer-facing layer your current system doesn't offer</strong>, at no extra work for your staff.
+      </div>
+    </div>
+
+    <div id="admin-invoices" class="subview">
+      <div class="section-title"><h2>Invoices</h2><p>Module 6 — generated automatically from CA rate, grace days, and crate rental</p></div>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+        <div class="stat-card"><div class="num" id="stat-total-billed">—</div><div class="lbl">Total Billed (this month)</div></div>
+        <div class="stat-card"><div class="num" id="stat-unbilled">—</div><div class="lbl">Unbilled</div></div>
+        <div class="stat-card"><div class="num" id="stat-invoice-count">—</div><div class="lbl">Invoices Generated</div></div>
+        <div class="stat-card"><div class="num" id="stat-avg-grace">—</div><div class="lbl">Avg. Grace Days Earned</div></div>
+      </div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Lot</th><th>Grower</th><th>CA Charge</th><th>Rental</th><th>Total</th><th>Status</th></tr></thead><tbody id="invoice-table"></tbody></table></div>
+    </div>
+
+    <div id="admin-import" class="subview">
+      <div class="section-title"><h2>Data Import &amp; Migration</h2><p>Module 7 — bring a facility's history from their existing system onto PHAOS</p></div>
+      <div class="dropzone" onclick="runImport()">
+        <div style="font-size:1.4rem;margin-bottom:8px;">&#128193;</div>
+        <div style="font-weight:600;color:var(--ink-700);">Click to simulate uploading a CSV export</div>
+        <div style="font-size:0.8rem;margin-top:4px;">Grower Agreements · Product Ledger · Crate Ledger · Chamber Ledger · Billing records</div>
+      </div>
+      <div id="import-result"></div>
+    </div>
+
+    <div id="admin-notifications" class="subview">
+      <div class="section-title"><h2>Notification Log</h2><p>Module 8 — every SMS/WhatsApp sent, and whether it was delivered</p></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Farmer</th><th>Channel</th><th>Event</th><th>Message</th><th>Sent</th><th>Status</th></tr></thead><tbody id="notification-table"></tbody></table></div>
+    </div>
+
+    <div id="admin-facilities" class="subview">
+      <div class="section-title"><h2>Facility Management</h2><p>Module 9 — onboarding, sync health, cross-facility view</p></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Facility</th><th>Location</th><th>Track</th><th>Last Sync</th><th>Status</th></tr></thead><tbody id="facility-table"></tbody></table></div>
     </div>
   </section>
 

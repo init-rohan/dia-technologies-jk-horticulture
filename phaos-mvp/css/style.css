@@ -145,3 +145,60 @@ main { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
 .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
 .success-box { text-align: center; padding: 10px 0; }
 .success-box .check { width: 54px; height: 54px; border-radius: 50%; background: var(--green-100); color: var(--green-700); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 14px; }
+
+/* Sub-navigation within a main tab */
+.subnav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.subnav-btn {
+  border: 1px solid var(--line); background: var(--white); color: var(--ink-700);
+  padding: 7px 16px; border-radius: 999px; font-weight: 600; font-size: 0.82rem; cursor: pointer;
+}
+.subnav-btn.active { background: var(--green-700); border-color: var(--green-700); color: var(--white); }
+.subview { display: none; }
+.subview.active { display: block; }
+
+/* Forms embedded directly in a card, not just modals */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.form-field label { display: block; font-size: 0.76rem; font-weight: 600; color: var(--ink-500); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+.form-field input, .form-field select {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px;
+  font-family: var(--sans); font-size: 0.9rem;
+}
+
+/* Tables */
+.table-wrap { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 32px; }
+table.data-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.data-table th {
+  text-align: left; background: var(--paper-alt); color: var(--ink-500); font-weight: 700;
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; padding: 10px 16px;
+}
+table.data-table td { padding: 12px 16px; border-top: 1px solid var(--paper-alt); }
+table.data-table tr:hover td { background: var(--paper-alt); }
+
+/* Status badges, semantic colors */
+.badge { display: inline-block; padding: 4px 11px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+.badge-pending { background: #fbeecb; color: var(--amber-600); }
+.badge-active { background: var(--green-100); color: var(--green-800); }
+.badge-done { background: #e2e8e4; color: var(--ink-700); }
+.badge-error { background: #fbe4e0; color: #a13a2a; }
+
+/* Queue cards for staff workflow screens */
+.queue-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.queue-card .who { font-weight: 700; color: var(--ink-900); }
+.queue-card .meta { color: var(--ink-500); font-size: 0.82rem; }
+.queue-actions { display: flex; gap: 8px; }
+
+/* Upload dropzone for Data Import */
+.dropzone {
+  border: 2px dashed var(--line); border-radius: var(--radius); padding: 36px;
+  text-align: center; color: var(--ink-500); background: var(--white); margin-bottom: 20px; cursor: pointer;
+}
+.dropzone:hover { border-color: var(--green-500); color: var(--green-700); }
+
+/* Stat cards for Admin overview */
+.stat-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.stat-card .num { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; color: var(--green-800); }
+.stat-card .lbl { font-size: 0.78rem; color: var(--ink-500); margin-top: 2px; }

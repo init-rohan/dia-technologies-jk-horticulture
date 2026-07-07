@@ -1,4 +1,4 @@
-const GRACE_PERIOD_DAYS = 15;
+const GRACE_DAYS_PER_MONTH_STORED = 3;
 const CRATE_RENTAL_PER_CRATE = 5;
 
 const FACILITIES = [
@@ -8,16 +8,19 @@ const FACILITIES = [
   { name: "Himalayan Agro Storage", loc: "Pulwama", used: 30, capacity: 5000, rate: 17, commodities: ["Apple", "Apricot"] },
 ];
 
+// Grace days accrue dynamically: 3 grace days for every full 30-day month
+// a lot has been in storage, not a flat allowance granted upfront.
 // rate shown on facility cards is ₹/crate/month. Bill below is computed from
 // that same rate, not a separate hardcoded number, so the two always agree.
 function computeBill(qty, daysStored, monthlyRatePerCrate) {
-  const billableDays = Math.max(0, daysStored - GRACE_PERIOD_DAYS);
+  const monthsCompleted = Math.floor(daysStored / 30);
+  const graceDays = monthsCompleted * GRACE_DAYS_PER_MONTH_STORED;
+  const billableDays = Math.max(0, daysStored - graceDays);
   const dailyRate = monthlyRatePerCrate / 30;
   const caCharge = Math.round(billableDays * dailyRate * qty);
   const rental = qty * CRATE_RENTAL_PER_CRATE;
-  const freeDays = Math.min(daysStored, GRACE_PERIOD_DAYS);
   const lines = [
-    [`CA Rate (${daysStored} days stored, first ${freeDays} free)`, caCharge === 0 ? "₹0" : "₹" + caCharge.toLocaleString()],
+    [`CA Rate (${daysStored} days stored, ${graceDays} grace days earned)`, "₹" + caCharge.toLocaleString()],
     ["Crate Rental", "₹" + rental.toLocaleString()],
   ];
   return { lines, total: caCharge + rental };
@@ -31,8 +34,8 @@ const MY_LOTS = [
   },
   {
     id: "L-2077", facility: "Fruit Basket Cold Chain Pvt Ltd", chamber: "Chamber 2",
-    qty: 60, unit: "crates", quality: "Grade B", intake: "15 Jun 2026",
-    daysStored: 22, shelfLifeDays: 120, balance: "In Storage",
+    qty: 60, unit: "crates", quality: "Grade B", intake: "28 May 2026",
+    daysStored: 40, shelfLifeDays: 120, balance: "In Storage",
   },
 ];
 
@@ -155,7 +158,7 @@ function confirmBooking() {
       <h3 style="margin-bottom:6px;">Booking Confirmed</h3>
       <p style="color:#616b64;font-size:0.9rem;line-height:1.5;">
         A storage agreement has been auto-generated for <strong>${name}</strong> at
-        <strong>${f.name}</strong> — CA Rate ₹${f.rate.toFixed(2)}/crate/month, 15-day grace period.
+        <strong>${f.name}</strong> — CA Rate ₹${f.rate}/crate/month. Earn 3 grace days for every month stored.
       </p>
       <p style="color:#3a8955;font-weight:700;font-size:0.85rem;margin-top:14px;">
         &#128172; SMS/WhatsApp sent: "Booking confirmed. Bring your produce to ${f.name} anytime."

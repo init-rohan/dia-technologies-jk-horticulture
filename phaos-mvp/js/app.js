@@ -1,22 +1,38 @@
+const GRACE_PERIOD_DAYS = 15;
+const CRATE_RENTAL_PER_CRATE = 5;
+
 const FACILITIES = [
-  { name: "Fruit Basket Cold Chain Pvt Ltd", loc: "Lassipora, Pulwama", used: 78, capacity: 5000, rate: 1.60, commodities: ["Apple", "Plum"] },
-  { name: "Wadoora CA Storage", loc: "Lassipora, Pulwama", used: 45, capacity: 4200, rate: 1.50, commodities: ["Apple", "Cherry"] },
-  { name: "Valley Fresh Cold Store", loc: "Shopian", used: 92, capacity: 3600, rate: 1.75, commodities: ["Apple", "Pear"] },
-  { name: "Himalayan Agro Storage", loc: "Pulwama", used: 30, capacity: 5000, rate: 1.55, commodities: ["Apple", "Apricot"] },
+  { name: "Fruit Basket Cold Chain Pvt Ltd", loc: "Lassipora, Pulwama", used: 78, capacity: 5000, rate: 18, commodities: ["Apple", "Plum"] },
+  { name: "Wadoora CA Storage", loc: "Lassipora, Pulwama", used: 45, capacity: 4200, rate: 16, commodities: ["Apple", "Cherry"] },
+  { name: "Valley Fresh Cold Store", loc: "Shopian", used: 92, capacity: 3600, rate: 20, commodities: ["Apple", "Pear"] },
+  { name: "Himalayan Agro Storage", loc: "Pulwama", used: 30, capacity: 5000, rate: 17, commodities: ["Apple", "Apricot"] },
 ];
+
+// rate shown on facility cards is ₹/crate/month. Bill below is computed from
+// that same rate, not a separate hardcoded number, so the two always agree.
+function computeBill(qty, daysStored, monthlyRatePerCrate) {
+  const billableDays = Math.max(0, daysStored - GRACE_PERIOD_DAYS);
+  const dailyRate = monthlyRatePerCrate / 30;
+  const caCharge = Math.round(billableDays * dailyRate * qty);
+  const rental = qty * CRATE_RENTAL_PER_CRATE;
+  const freeDays = Math.min(daysStored, GRACE_PERIOD_DAYS);
+  const lines = [
+    [`CA Rate (${daysStored} days stored, first ${freeDays} free)`, caCharge === 0 ? "₹0" : "₹" + caCharge.toLocaleString()],
+    ["Crate Rental", "₹" + rental.toLocaleString()],
+  ];
+  return { lines, total: caCharge + rental };
+}
 
 const MY_LOTS = [
   {
     id: "L-2091", facility: "Fruit Basket Cold Chain Pvt Ltd", chamber: "Chamber 5",
     qty: 100, unit: "crates", quality: "Grade A", intake: "28 Jun 2026",
     daysStored: 9, shelfLifeDays: 120, balance: "In Storage",
-    bill: [["CA Rate (9 days)", "₹1,440"], ["Crate Rental", "₹500"], ["Grace Period Applied", "-₹0"]],
   },
   {
     id: "L-2077", facility: "Fruit Basket Cold Chain Pvt Ltd", chamber: "Chamber 2",
-    qty: 60, unit: "crates", quality: "Grade B", intake: "25 Jun 2026",
-    daysStored: 12, shelfLifeDays: 120, balance: "In Storage",
-    bill: [["CA Rate (12 days)", "₹1,152"], ["Crate Rental", "₹300"], ["Grace Period Applied", "-₹192"]],
+    qty: 60, unit: "crates", quality: "Grade B", intake: "15 Jun 2026",
+    daysStored: 22, shelfLifeDays: 120, balance: "In Storage",
   },
 ];
 
@@ -40,7 +56,7 @@ function renderFacilities() {
         <div class="capacity-bar"><div class="capacity-fill" style="width:${f.used}%"></div></div>
         <div class="capacity-label"><span>${f.used}% full</span><span>${available.toLocaleString()} crates available</span></div>
         <div class="rate-row">
-          <div class="rate">₹${f.rate.toFixed(2)}<small>/crate/month</small></div>
+          <div class="rate">₹${f.rate}<small>/crate/month</small></div>
           <button class="btn btn-primary" onclick="openBooking(${i})">Book Slot</button>
         </div>
       </div>`;
@@ -52,6 +68,8 @@ function renderLots() {
   wrap.innerHTML = MY_LOTS.map((l) => {
     const pct = Math.min(100, Math.round((l.daysStored / l.shelfLifeDays) * 100));
     const remaining = l.shelfLifeDays - l.daysStored;
+    const facilityRate = FACILITIES.find((f) => f.name === l.facility).rate;
+    const bill = computeBill(l.qty, l.daysStored, facilityRate);
     return `
       <div class="card">
         <h3>Lot ${l.id}</h3>
@@ -67,22 +85,14 @@ function renderLots() {
           <div class="lot-progress-label">${remaining} days estimated shelf life remaining</div>
         </div>
         <div style="margin-top:16px;">
-          ${l.bill.map(([label, amt]) => `<div class="bill-line"><span>${label}</span><span>${amt}</span></div>`).join("")}
-          <div class="bill-line total"><span>Running Total</span><span>${sumBill(l.bill)}</span></div>
+          ${bill.lines.map(([label, amt]) => `<div class="bill-line"><span>${label}</span><span>${amt}</span></div>`).join("")}
+          <div class="bill-line total"><span>Running Total</span><span>₹${bill.total.toLocaleString()}</span></div>
         </div>
         <div class="rate-row" style="margin-top:14px;">
           <button class="btn btn-ghost" onclick="requestPickup('${l.id}')">Request Pickup</button>
         </div>
       </div>`;
   }).join("");
-}
-
-function sumBill(bill) {
-  const total = bill.reduce((sum, [, amt]) => {
-    const n = parseFloat(amt.replace(/[₹,]/g, ""));
-    return sum + n;
-  }, 0);
-  return "₹" + total.toLocaleString();
 }
 
 function renderDashboard() {
